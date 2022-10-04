@@ -16,17 +16,20 @@ class HomeTableViewController: UITableViewController {
    
     override func viewDidLoad() {
         super.viewDidLoad()
-        self.navigationController?.navigationBar.backgroundColor = #colorLiteral(red: 0.1002852395, green: 0.6974458098, blue: 0.9604418874, alpha: 1 )
-        self.navigationController?.navigationBar.barTintColor = #colorLiteral(red: 0.1002852395, green: 0.6974458098, blue: 0.9604418874, alpha: 1)
-        self.navigationController?.navigationBar.tintColor = #colorLiteral(red: 0.1002852395, green: 0.6974458098, blue: 0.9604418874, alpha: 1)
-        
         loadTweets()
         
         //action: what do you want to do to -> run loadTweet again
         myRefreshControl.addTarget(self, action: #selector(loadTweets), for: .valueChanged)
         tableView.refreshControl = myRefreshControl
+        //row height is auto calculated
+        self.tableView.rowHeight = UITableView.automaticDimension
+        //at least to 163 height, depends on how big big you drag your box
+        self.tableView.estimatedRowHeight = 163
     }
-    
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        self.loadTweets()
+    }
     @objc func loadTweets() {
         numOfTweet = 20
         let myUrl = "https://api.twitter.com/1.1/statuses/home_timeline.json"
@@ -103,6 +106,10 @@ class HomeTableViewController: UITableViewController {
             cell.profileImageView.image = UIImage(data: imageData)
         }
         
+        cell.setFavorite(tweetArray[indexPath.row]["favorited"] as! Bool)
+        cell.tweetID = tweetArray[indexPath.row]["id"] as! Int
+        cell.setRetweeted( tweetArray[indexPath.row]["retweeted"] as! Bool)
+        
         return cell
     }
     override func numberOfSections(in tableView: UITableView) -> Int {
@@ -110,7 +117,7 @@ class HomeTableViewController: UITableViewController {
     }
 
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        tableView.rowHeight = 120
+//        tableView.rowHeight = 120
         return tweetArray.count
     }
 
